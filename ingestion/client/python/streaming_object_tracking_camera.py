@@ -55,7 +55,6 @@ def streaming_annotate(stream_file):
             response_filter(requests)
         
     def response_filter(request):
-        import pdb; pdb.set_trace()
         # streaming_annotate_video returns a generator.
         # timeout argument specifies the maximum allowable time duration between
         # the time that the last packet is sent to Google video intelligence API
@@ -68,7 +67,9 @@ def streaming_annotate(stream_file):
             # Check for errors.
             if response.error.message:
                 print(response.error.message)
-                break
+                continue
+            else:
+                import pdb; pdb.set_trace()
 
             if response.annotation_results.object_annotations:
                 for annotation in response.annotation_results.object_annotations:
