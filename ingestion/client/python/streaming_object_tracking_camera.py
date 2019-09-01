@@ -43,18 +43,12 @@ def streaming_annotate(stream_file):
         yield config_request
         yield videointelligence.types.StreamingAnnotateVideoRequest(
             input_content=chunk)
-                
-    # Load file content.
-    with io.open(stream_file, 'rb') as video_file:
-        while True:
-            data = video_file.read(chunk_size)
-            if not data:
-                break
-            # stream.append(data)
-            requests = stream_generator(data)
-            response_filter(requests)
-        
-    def response_filter(request):
+
+    def focus_camera(top, bottom, left, right):
+        # focus camera to coordinates
+        print("person found moving camera")
+
+    def response_filter(requests):
         # streaming_annotate_video returns a generator.
         # timeout argument specifies the maximum allowable time duration between
         # the time that the last packet is sent to Google video intelligence API
@@ -67,9 +61,8 @@ def streaming_annotate(stream_file):
             # Check for errors.
             if response.error.message:
                 print(response.error.message)
+                # handle more gracefully later
                 continue
-            else:
-                import pdb; pdb.set_trace()
 
             if response.annotation_results.object_annotations:
                 for annotation in response.annotation_results.object_annotations:
@@ -98,15 +91,21 @@ def streaming_annotate(stream_file):
                     print('\ttop   : {}'.format(box.top))
                     print('\tright : {}'.format(box.right))
                     print('\tbottom: {}\n'.format(box.bottom))
-                    
-                    if (description.encode('utf-8').strip() == "person" and confidence > 0.80):
-                        #send coordinates to camera
+
+                    if (description.encode('utf-8').strip() == "person" and confidence > 0.70):
+                        # send coordinates to camera
                         focus_camera(box.top, box.bottom, box.left, box.right)
 
-#method to shift camera based on 
-def focus_camera(top, bottom, left, right):
-    #focus camera to coordinates
-    print( "moving camera")
+    # Load file content.
+    with io.open(stream_file, 'rb') as video_file:
+        
+        while True:
+            data = video_file.read(chunk_size)
+            if not data:
+                break            
+            requests = stream_generator(data)
+            response_filter(requests)
+        
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
