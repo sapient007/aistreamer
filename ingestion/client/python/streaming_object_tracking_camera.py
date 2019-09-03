@@ -98,11 +98,14 @@ def streaming_annotate(stream_file):
 
     # Load file content.
     with io.open(stream_file, 'rb') as video_file:
-        
+
+        counter=0
         while True:
             data = video_file.read(chunk_size)
             if not data:
                 break            
+            print('chuncks of data sent :  {}'.format(counter))
+            counter += 1
             requests = stream_generator(data)
             response_filter(requests)
         
