@@ -104,8 +104,8 @@ def streaming_annotate(stream_file):
             data = video_file.read(chunk_size)
             if not data:
                 break            
-            print('chuncks of data sent :  {}'.format(counter))
             counter += 1
+            print('chuncks of data sent :  {}  data size : {}'.format(counter, len(data)))
             requests = stream_generator(data)
             response_filter(requests)
         
